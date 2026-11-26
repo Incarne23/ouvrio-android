@@ -1,0 +1,47 @@
+# Publie l'APK officielle (apk/OUVRIO.apk) dans une Release publique, APRÈS vérification :
+#  - empreinte du fichier identique à apk/version.json ;
+#  - signature valide (apksigner) avec UN seul certificat : le certificat officiel OUVRIO.
+# Toute anomalie arrête la publication. Le lien public stable est : releases/latest/download/OUVRIO.apk
+name: Publier l'APK officielle
+on:
+  push:
+    branches: [main]
+    paths: ['apk/**', '.github/workflows/publier-apk.yml']
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: publier-apk
+  cancel-in-progress: false
+jobs:
+  publier:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: Vérifier l'APK (empreinte et signature officielle)
+        run: |
+          set -euo pipefail
+          V=$(jq -r .version apk/version.json); F=$(jq -r .fichier_sha256 apk/version.json); C=$(jq -r .certificat_sha256 apk/version.json)
+          GOT=$(sha256sum apk/OUVRIO.apk | cut -d' ' -f1)
+          [ "$GOT" = "$F" ] || { echo "::error::Empreinte du fichier différente ($GOT). Rien n'est publié."; exit 1; }
+          BT=$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)
+          "${BT}apksigner" verify --verbose --print-certs apk/OUVRIO.apk > sig.txt || { cat sig.txt; echo "::error::Signature invalide. Rien n'est publié."; exit 1; }
+          WANT=$(printf '%s' "$C" | tr -d ':' | tr 'A-F' 'a-f')
+          grep 'certificate SHA-256 digest' sig.txt | awk '{print $NF}' | sort -u > certs.txt
+          [ "$(cat certs.txt)" = "$WANT" ] || { cat certs.txt; echo "::error::L'APK n'est pas signée uniquement avec le certificat officiel OUVRIO. Rien n'est publié."; exit 1; }
+          grep -E '^(Verified using v2|Number of signers)' sig.txt
+          echo "✅ APK $V vérifiée : fichier $F, certificat $C"
+          echo "V=$V" >> "$GITHUB_ENV"
+      - name: Publier la Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if gh release view "v$V" >/dev/null 2>&1; then
+            gh release upload "v$V" apk/OUVRIO.apk --clobber
+          else
+            gh release create "v$V" apk/OUVRIO.apk --target "$GITHUB_SHA" --latest --title "OUVRIO Android $V" \
+              --notes "Application Android officielle OUVRIO, version $V. Signée avec le certificat officiel OUVRIO (SHA-256 $(jq -r .certificat_sha256 apk/version.json)). Empreinte du fichier : $(jq -r .fichier_sha256 apk/version.json). Page officielle : https://incarne23.github.io/ouvrio-android/"
+          fi
+          gh release view "v$V" --json assets -q '.assets[].name'
