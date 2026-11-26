@@ -1,0 +1,33 @@
+# Met à jour l'instantané des données PUBLIQUES d'OUVRIO (catégories, boutiques, produits) affiché par la version web de
+# découverte. Aucun secret : seules les adresses publiques de l'API sont lues. Les coordonnées sont retirées et un
+# contrôle de sécurité arrête la mise à jour si une donnée sensible apparaissait.
+name: Instantané des données publiques
+on:
+  schedule:
+    - cron: '17 * * * *'   # toutes les heures
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['outils/instantane.mjs', '.github/workflows/instantane.yml']
+permissions:
+  contents: write
+concurrency:
+  group: instantane
+  cancel-in-progress: false
+jobs:
+  instantane:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '22'
+      - name: Lire les données publiques d'OUVRIO
+        run: node outils/instantane.mjs
+      - name: Publier si quelque chose a changé
+        run: |
+          git add -A donnees
+          if git diff --cached --quiet; then echo "Aucun changement."; exit 0; fi
+          git -c user.name="OUVRIO (instantané)" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -q -m "Instantané des données publiques"
+          git push
