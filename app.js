@@ -6,8 +6,8 @@
   var CONFIG = {
     apk: 'https://github.com/Incarne23/ouvrio-android/releases/latest/download/OUVRIO.apk',
     version: '0.8.3', size: '42,5 Mo', date: '26 novembre 2026',
-    whatsapp: '', // numéro officiel d'assistance, format international sans « + » (ex. 2250700000000) — EN ATTENTE DE CONFIRMATION
-    whatsappText: 'Bonjour, je découvre OUVRIO depuis votre site web et j’ai besoin d’assistance.',
+    whatsapp: '2250556032123', // numéro officiel d'assistance (+225 05 56 03 21 23), format international sans « + »
+    whatsappText: 'Bonjour, je découvre OUVRIO depuis la plateforme web et j’ai besoin d’assistance.',
     email: 'myouvrio@gmail.com',
     legal: 'https://ouvrio-app-api.onrender.com',
     sha: '73:F8:A2:3E:C8:D7:B7:50:DC:BD:03:E8:C8:ED:72:50:85:32:39:84:8C:37:61:0D:3D:6A:B7:FF:E0:B4:1F:1B',
@@ -61,10 +61,10 @@
   // ------------------------------------------------------------------ Composants
   function topMain() {
     return '<div class="top"><div class="brand"><a href="#/" aria-label="Accueil OUVRIO"><img src="logo.webp" width="440" height="120" alt="OUVRIO"></a>' +
-      '<button class="pill" data-dl="header">' + ic('dl') + 'Télécharger</button></div>' + fbBanner() +
+      '<a class="pill" href="' + CONFIG.apk + '" data-apk>' + ic('dl') + 'Télécharger OUVRIO</a></div>' + fbBanner() +
       '<button class="search" data-go="#/recherche">' + ic('search') + '<span>Plombier, coiffure…</span><b>' + ic('pin') + esc((D.countries[0] || {}).name || 'Côte d’Ivoire') + '</b></button></div>';
   }
-  function topSub(title) { return '<div class="top sub"><button class="back" data-back aria-label="Retour">' + ic('left') + '</button><h1>' + esc(title) + '</h1><button class="pill" data-dl="header">' + ic('dl') + 'App</button></div>'; }
+  function topSub(title) { return '<div class="top sub"><button class="back" data-back aria-label="Retour">' + ic('left') + '</button><h1>' + esc(title) + '</h1><a class="pill" href="' + CONFIG.apk + '" data-apk>' + ic('dl') + 'Télécharger</a></div>'; }
   function fbBanner() {
     if (!(IN_APP && ANDROID)) return '';
     return '<div class="fb"><p>Pour installer OUVRIO facilement, ouvrez cette page dans Chrome.</p><a href="intent://' + esc(location.host + location.pathname) + '#Intent;scheme=https;package=com.android.chrome;end">Ouvrir dans Chrome</a></div>';
@@ -172,6 +172,7 @@
       (s.description ? '<p class="desc" style="margin-top:10px">' + esc(s.description) + '</p>' : '') + '</div></div>' +
       '<button class="btn b-wa mt" data-gate="contact">' + WA_ICON.replace('<svg', '<svg style="width:22px;height:22px"') + 'Contacter la boutique</button>' +
       '<button class="btn b-l mt" data-gate="favori">' + ic('heart') + 'Ajouter à mes favoris</button>' +
+      '<button class="btn b-l mt" data-gate="avis">' + ic('star') + 'Laisser un avis</button>' +
       '<h2>Produits (' + prods.length + ')</h2>' + (prods.length ? '<div class="prods">' + prods.map(prodCard).join('') + '</div>' : '<p class="sub2">Les produits de cette boutique arrivent bientôt.</p>') };
   };
   S.produit = function (id) {
@@ -240,17 +241,19 @@
   }
 
   // ------------------------------------------------------------------ Fenêtres (invitation, installation, assistance)
+  var GENERAL = 'Vous pouvez explorer notre plateforme, découvrir les services et les boutiques. Pour effectuer vos demandes, contacter les professionnels, créer votre compte et profiter de toutes les fonctionnalités, téléchargez l’application officielle OUVRIO.';
   var GATES = {
-    demande: ['Envoyez votre demande depuis l’application', 'Votre demande sera transmise aux professionnels de votre zone, et vous suivrez leurs réponses dans votre compte.'],
-    contact: ['Contactez cette boutique depuis l’application', 'Le contact direct avec les boutiques partenaires se fait depuis votre compte OUVRIO.'],
-    commande: ['Commandez depuis l’application', 'Contactez le vendeur et commandez ce produit depuis l’application OUVRIO.'],
-    favori: ['Gardez vos favoris dans l’application', 'Retrouvez vos boutiques et produits préférés dans votre compte OUVRIO.'],
-    prestataire: ['Devenez prestataire OUVRIO', 'Créez votre espace prestataire dans l’application et recevez les demandes de votre métier, près de chez vous.'],
-    boutique: ['Ouvrez votre boutique sur OUVRIO', 'Créez votre boutique dans l’application : vitrine, produits, prix et contacts clients.'],
-    employeur: ['Trouvez du personnel avec OUVRIO', 'Déposez votre demande de personnel depuis l’application OUVRIO.'],
-    candidat: ['Trouvez un travail avec OUVRIO', 'Créez votre profil candidat gratuitement dans l’application OUVRIO.'],
-    compte: ['Créez votre compte OUVRIO', 'La création de compte se fait dans l’application : c’est gratuit et rapide.'],
-    connexion: ['Connectez-vous dans l’application', 'Votre compte OUVRIO s’utilise dans l’application Android.'],
+    demande: ['Votre demande est presque prête !', 'Pour l’envoyer et trouver un professionnel, téléchargez l’application OUVRIO.'],
+    contact: ['Vous découvrez OUVRIO ! 🎉', 'Pour contacter cette boutique, téléchargez l’application officielle OUVRIO.'],
+    commande: ['Vous découvrez OUVRIO ! 🎉', 'Pour commander ce produit et contacter le vendeur, téléchargez l’application officielle OUVRIO.'],
+    favori: ['Vous découvrez OUVRIO ! 🎉', 'Pour enregistrer vos favoris, téléchargez l’application officielle OUVRIO.'],
+    avis: ['Vous découvrez OUVRIO ! 🎉', 'Pour laisser un avis, téléchargez l’application officielle OUVRIO.'],
+    prestataire: ['Devenez prestataire OUVRIO 🛠️', 'Pour créer votre espace prestataire, publier vos services et recevoir des demandes près de chez vous, téléchargez l’application officielle OUVRIO.'],
+    boutique: ['Ouvrez votre boutique OUVRIO 🛍️', 'Pour créer votre boutique et présenter vos produits, téléchargez l’application officielle OUVRIO.'],
+    employeur: ['Vous découvrez OUVRIO ! 🎉', 'Pour déposer votre demande de personnel, téléchargez l’application officielle OUVRIO.'],
+    candidat: ['Vous découvrez OUVRIO ! 🎉', 'Pour créer votre profil candidat et postuler, téléchargez l’application officielle OUVRIO.'],
+    compte: ['Vous découvrez OUVRIO ! 🎉', 'Pour créer votre compte gratuit, téléchargez l’application officielle OUVRIO.'],
+    connexion: ['Vous découvrez OUVRIO ! 🎉', 'Pour vous connecter à votre compte, téléchargez l’application officielle OUVRIO.'],
   };
   function closeLayer() { $('layer').innerHTML = ''; document.body.style.overflow = ''; }
   function sheet(html) {
@@ -258,24 +261,18 @@
     document.body.style.overflow = 'hidden';
   }
   function gate(kind) {
-    var g = GATES[kind] || ['Profitez de toutes les fonctionnalités', ''];
-    sheet('<h3>Vous découvrez OUVRIO ! 🎉</h3><p class="lead"><b style="color:#0B2447">' + esc(g[0]) + '.</b> ' + esc(g[1]) + ' Téléchargez gratuitement l’application pour profiter de toutes les fonctionnalités.</p>' + benefits() +
-      '<a class="btn b-cta" href="' + CONFIG.apk + '" data-apk>' + ic('dl') + 'TÉLÉCHARGER OUVRIO</a><button class="btn b-g mt" data-close>Continuer à explorer</button>' +
-      '<p class="small">Gratuit · Android · Version ' + CONFIG.version + ' · ' + CONFIG.size + '<br>Vous créerez ensuite votre compte dans l’application.</p>');
+    var g = GATES[kind] || ['Vous découvrez OUVRIO ! 🎉', GENERAL];
+    sheet('<h3>' + esc(g[0]) + '</h3><p class="lead">' + esc(g[1]) + '</p>' + (kind === 'demande' ? '' : '<p class="lead" style="margin-top:-6px;font-size:13.5px">Vous pouvez continuer à explorer la plateforme, les services et les boutiques.</p>') + benefits() +
+      '<a class="btn b-cta" href="' + CONFIG.apk + '" data-apk>📲 TÉLÉCHARGER OUVRIO</a><button class="btn b-g mt" data-close>CONTINUER À EXPLORER</button>' +
+      '<p class="small">L’application est gratuite à télécharger · Android · Version ' + CONFIG.version + ' · ' + CONFIG.size + '</p>');
   }
   function afterDownload() {
     sheet('<div class="okbox">' + ic('check') + '<span>Téléchargement lancé ! Suivez ces étapes pour installer OUVRIO.</span></div>' + installSteps() +
       (IN_APP ? '<div class="fb"><p>Rien ne se passe ? Ouvrez la page dans Chrome puis réessayez.</p><a href="intent://' + esc(location.host + location.pathname) + '#Intent;scheme=https;package=com.android.chrome;end">Chrome</a></div>' : '') +
       '<button class="btn b-g mt" data-close>Continuer à explorer</button><button class="btn b-l mt" data-help>Besoin d’aide pour installer ?</button>');
   }
-  function help() {
-    var wa = CONFIG.whatsapp ? 'https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(CONFIG.whatsappText) : '';
-    if (wa) { window.open(wa, '_blank', 'noopener'); return; }
-    sheet('<h3>Assistance OUVRIO</h3><p class="lead">Une question, un problème d’installation ? Notre équipe vous répond.</p>' +
-      '<div class="note" style="margin-top:0">' + ic('info') + '<span>L’assistance WhatsApp arrive très bientôt. En attendant, écrivez-nous par e-mail.</span></div>' +
-      '<a class="btn b-n mt" href="mailto:' + CONFIG.email + '?subject=' + encodeURIComponent('Assistance OUVRIO') + '&body=' + encodeURIComponent(CONFIG.whatsappText) + '">' + ic('mail') + 'Écrire à ' + CONFIG.email + '</a>' +
-      '<button class="btn b-g mt" data-close>Fermer</button>');
-  }
+  function waLink() { return 'https://wa.me/' + CONFIG.whatsapp + '?text=' + encodeURIComponent(CONFIG.whatsappText); }
+  function help() { window.open(waLink(), '_blank', 'noopener'); }
 
   // ------------------------------------------------------------------ Navigation
   var TABS = [['accueil', 'Accueil', 'home', '#/'], ['explorer', 'Explorer', 'grid', '#/explorer'], ['demande', 'Demande', 'plus', '#/demande'], ['boutiques', 'Boutiques', 'bag', '#/boutiques'], ['compte', 'Compte', 'user', '#/compte']];
@@ -293,7 +290,7 @@
   function snack() {
     snackShown = true;
     var d = document.createElement('div'); d.className = 'snack'; d.id = 'snack';
-    d.innerHTML = '<p><b>OUVRIO vous plaît ?</b><br>Installez l’application gratuite.</p><button class="pill" data-dl="snack">Installer</button><button class="x" aria-label="Fermer" data-snackx>' + ic('x') + '</button>';
+    d.innerHTML = '<p><b>OUVRIO vous plaît ?</b><br>Installez l’application gratuite.</p><a class="pill" href="' + CONFIG.apk + '" data-apk>Télécharger</a><button class="x" aria-label="Fermer" data-snackx>' + ic('x') + '</button>';
     document.body.appendChild(d);
   }
   function go(href) { if (location.hash === href) route(); else { depth++; location.hash = href; } }
@@ -301,10 +298,10 @@
     var t = e.target.closest('[data-close],[data-go],[data-back],[data-gate],[data-dl],[data-apk],[data-help],[data-snackx],a[href^="#/"]');
     if (!t) return;
     if (t.hasAttribute('data-close')) { if (e.target === t || t.tagName === 'BUTTON') closeLayer(); return; }
-    if (t.hasAttribute('data-apk')) { setTimeout(afterDownload, 700); return; } // le lien télécharge réellement l'APK, puis on affiche les étapes
+    if (t.hasAttribute('data-apk')) { var sn = $('snack'); if (sn) sn.remove(); setTimeout(afterDownload, 700); return; } // le lien télécharge réellement l'APK, puis on affiche les étapes
     e.preventDefault();
     if (t.hasAttribute('data-snackx')) { var s = $('snack'); if (s) s.remove(); return; }
-    if (t.hasAttribute('data-help')) { help(); return; }
+    if (t.hasAttribute('data-help')) { if (t.tagName !== 'A') help(); else return; return; }
     if (t.hasAttribute('data-dl')) { var s2 = $('snack'); if (s2) s2.remove(); gate(); $('layer').querySelector('h3').textContent = 'Installez OUVRIO 📲'; return; }
     if (t.hasAttribute('data-gate')) { gate(t.getAttribute('data-gate')); return; }
     if (t.hasAttribute('data-back')) { if (depth > 0) { depth--; history.back(); } else location.hash = '#/'; return; }
@@ -313,8 +310,7 @@
   window.addEventListener('hashchange', function () { closeLayer(); route(); });
   document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeLayer(); });
 
-  $('wa').innerHTML = WA_ICON;
-  $('wa').addEventListener('click', help);
+  $('wa').innerHTML = WA_ICON; $('wa').href = waLink();
 
   fetch('donnees/catalogue.json', { cache: 'no-cache' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); }).then(function (d) {
     d.categories = d.categories || []; d.shops = d.shops || []; d.products = d.products || []; d.countries = d.countries || []; d.features = d.features || {}; d.content = d.content || { hero: {}, provider: {}, partner: {} };
