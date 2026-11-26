@@ -38,8 +38,9 @@ const saved = new Map();
 async function image(url, { variants = [] } = {}) {
   if (!url || typeof url !== 'string' || !/^(\/img\/|\/v1\/(medias|contenus\/images)\/)/.test(url)) return null; // seulement les images du serveur OUVRIO
   if (saved.has(url)) return saved.get(url);
+  const src = url.replace(/([?&]w=)\d+/, '$1720'); // images de produits : 720 px suffisent sur téléphone (chargement plus rapide)
   let got = null;
-  for (const u of [...variants, url]) { try { got = await get(u, { raw: true, tries: 2 }); } catch { got = null; } if (got && /^image\//.test(got.type)) break; got = null; }
+  for (const u of [...variants, src]) { try { got = await get(u, { raw: true, tries: 2 }); } catch { got = null; } if (got && /^image\//.test(got.type)) break; got = null; }
   if (!got) { saved.set(url, null); return null; }
   const ext = got.type.includes('svg') ? 'svg' : got.type.includes('png') ? 'png' : got.type.includes('jpeg') ? 'jpg' : 'webp';
   const name = createHash('sha256').update(got.buf).digest('hex').slice(0, 16) + '.' + ext;
