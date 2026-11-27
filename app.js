@@ -5,7 +5,7 @@
   // ------------------------------------------------------------------ Réglages
   var CONFIG = {
     apk: 'https://github.com/Incarne23/ouvrio-android/releases/latest/download/OUVRIO.apk',
-    version: '0.8.6', size: '42,5 Mo', date: '26 novembre 2026',
+    version: '0.8.7', size: '42,5 Mo', date: '27 novembre 2026',
     whatsapp: '2250556032123', // numéro officiel d'assistance (+225 05 56 03 21 23), format international sans « + »
     whatsappText: 'Bonjour, je découvre OUVRIO depuis la plateforme web et j’ai besoin d’assistance.',
     email: 'myouvrio@gmail.com',
